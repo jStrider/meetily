@@ -93,7 +93,7 @@ enum MeetingFolderResolution {
 /// Expected format: { "markdown": "...", "summary_json": [...BlockNote blocks...] }
 #[tauri::command]
 pub async fn api_save_meeting_summary<R: Runtime>(
-    _app: AppHandle<R>,
+    app: AppHandle<R>,
     state: tauri::State<'_, AppState>,
     meeting_id: String,
     summary: serde_json::Value,
@@ -112,6 +112,13 @@ pub async fn api_save_meeting_summary<R: Runtime>(
     match SummaryProcessesRepository::update_meeting_summary(pool, &meeting_id, &summary).await {
         Ok(true) => {
             log_info!("Summary saved successfully for meeting_id: {}", meeting_id);
+            match summary.get("markdown").and_then(|m| m.as_str()) {
+                Some(markdown) => {
+                    crate::summary::auto_save::auto_save_summary(&app, pool, &meeting_id, markdown)
+                        .await
+                }
+                None => log_warn!("Summary auto-save skipped for {}: no markdown", meeting_id),
+            }
             Ok(serde_json::json!({
                 "message": "Meeting summary saved successfully"
             }))

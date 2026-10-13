@@ -5,6 +5,7 @@ import { invoke } from '@tauri-apps/api/core';
 import { toast } from 'sonner';
 import { ModelConfig, ModelSettingsModal } from '@/components/ModelSettingsModal';
 import { SummaryLanguageSettings } from '@/components/SummaryLanguageSettings';
+import { SummaryAutoSaveSettings } from '@/components/SummaryAutoSaveSettings';
 import { Switch } from './ui/switch';
 import { useConfig } from '@/contexts/ConfigContext';
 
@@ -133,6 +134,8 @@ export function SummaryModelSettings({ refetchTrigger }: SummaryModelSettingsPro
           <Switch checked={isAutoSummary} onCheckedChange={toggleIsAutoSummary} />
         </div>
       </div>
+
+      <SummaryAutoSaveSettings />
 
       <SummaryLanguageSettings />
 
